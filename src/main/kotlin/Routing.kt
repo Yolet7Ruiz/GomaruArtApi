@@ -1,6 +1,7 @@
 package com.gomaruart
 
 import com.gomaruart.config.DatabaseConfig
+import com.gomaruart.presentation.routes.authRoutes  // ← IMPORTAR
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -23,5 +24,8 @@ fun Application.configureRouting() {
                 call.respondText("Error: ${e.message}")
             }
         }
+
+        //  AGREGAR ESTA LÍNEA
+        authRoutes()
     }
 }
