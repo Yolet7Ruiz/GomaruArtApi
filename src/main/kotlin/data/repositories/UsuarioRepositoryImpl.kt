@@ -39,7 +39,8 @@ class UsuarioRepositoryImpl : UsuarioRepository {
         }
 
         val hash = SecurityConfig.hashPassword(password)
-        val sql = "INSERT INTO usuarios (username, password_hash) VALUES (?, ?) RETURNING id"
+        // CAMBIO AQUÍ: id_admin en lugar de id
+        val sql = "INSERT INTO usuarios (username, password_hash) VALUES (?, ?) RETURNING id_admin"
 
         DatabaseConfig.getConnection().use { conn ->
             conn.prepareStatement(sql).use { stmt ->
@@ -48,8 +49,9 @@ class UsuarioRepositoryImpl : UsuarioRepository {
 
                 val rs = stmt.executeQuery()
                 if (rs.next()) {
-                    val id = rs.getInt(1)
-                    return Usuario(id, username, hash, "")  // ← String vacío
+                    // CAMBIO AQUÍ: obtener por nombre de columna
+                    val id = rs.getInt("id_admin")
+                    return Usuario(id, username, hash, "")
                 }
             }
         }
@@ -57,9 +59,10 @@ class UsuarioRepositoryImpl : UsuarioRepository {
     }
 
     private fun mapResultSetToUsuario(rs: ResultSet): Usuario = Usuario(
-        id = rs.getInt("id"),
+        // CAMBIO AQUÍ: id_admin en lugar de id
+        id = rs.getInt("id_admin"),
         username = rs.getString("username"),
         passwordHash = rs.getString("password_hash"),
-        createdAt = rs.getString("created_at")  // ← Directo como String
+        createdAt = rs.getString("created_at")
     )
 }

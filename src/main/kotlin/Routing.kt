@@ -1,7 +1,8 @@
 package com.gomaruart
 
 import com.gomaruart.config.DatabaseConfig
-import com.gomaruart.presentation.routes.authRoutes  // ← IMPORTAR
+import com.gomaruart.presentation.routes.authRoutes
+import com.gomaruart.presentation.routes.obraRoutes  // ← IMPORTAR
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -25,7 +26,7 @@ fun Application.configureRouting() {
             }
         }
 
-        //  AGREGAR ESTA LÍNEA
         authRoutes()
+        obraRoutes()
     }
 }
