@@ -1,22 +1,23 @@
 package com.gomaruart
 
-import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.cors.routing.*
-import io.ktor.server.plugins.defaultheaders.*
-import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.slf4j.event.*
+import kotlinx.serialization.json.Json // Importante para configurar el bloque json
 
 fun Application.configureSerialization() {
     install(ContentNegotiation) {
-        json()
+        json(Json {
+
+            prettyPrint = true          // Hace que el JSON sea legible en logs
+            isLenient = true            // Es más permisivo con formatos de texto
+            ignoreUnknownKeys = true    // LA MAGIA: ignora campos extra como 'id_obra'
+            encodeDefaults = true       // Incluye valores por defecto en el JSON
+        })
     }
+
     routing {
         get("/json/kotlinx-serialization") {
             call.respond(mapOf("hello" to "world"))

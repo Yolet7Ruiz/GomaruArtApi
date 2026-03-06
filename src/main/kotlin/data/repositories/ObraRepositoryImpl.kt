@@ -72,7 +72,11 @@ class ObraRepositoryImpl : ObraRepository {
                 stmt.setDouble(3, obra.precio)
                 stmt.setString(4, obra.imagen_url)
                 stmt.setString(5, obra.tecnica_materiales)
-                stmt.setInt(6, obra.id_categoria)
+
+                // SEGURO: Si llega 0, forzamos categoría 1
+                val catId = if (obra.id_categoria > 0) obra.id_categoria else 1
+                stmt.setInt(6, catId)
+
                 stmt.setInt(7, idAdmin)
 
                 val rs = stmt.executeQuery()
@@ -86,6 +90,9 @@ class ObraRepositoryImpl : ObraRepository {
     }
 
     override fun update(id: Int, obra: Obra): Obra? {
+        // Log para que veas en la consola de IntelliJ qué está llegando
+        println("BACKEND DEBUG: Actualizando obra ID $id con categoria: ${obra.id_categoria}")
+
         val sql = """
             UPDATE obras 
             SET titulo = ?, descripcion = ?, precio = ?, imagen_url = ?, 
@@ -100,7 +107,11 @@ class ObraRepositoryImpl : ObraRepository {
                 stmt.setDouble(3, obra.precio)
                 stmt.setString(4, obra.imagen_url)
                 stmt.setString(5, obra.tecnica_materiales)
-                stmt.setInt(6, obra.id_categoria)
+
+                // SEGURO: Si llega 0, forzamos categoría 1 para evitar error de FK
+                val catId = if (obra.id_categoria > 0) obra.id_categoria else 1
+                stmt.setInt(6, catId)
+
                 stmt.setInt(7, id)
 
                 val updated = stmt.executeUpdate()
@@ -129,7 +140,7 @@ class ObraRepositoryImpl : ObraRepository {
         tecnica_materiales = rs.getString("tecnica_materiales"),
         id_categoria = rs.getInt("id_categoria"),
         id_admin = rs.getInt("id_admin"),
-        fecha_creacion = rs.getString("fecha_creacion"),
+        fecha_creacion = rs.getString("fecha_creacion") ?: "",
         activo = rs.getBoolean("activo")
     )
 }

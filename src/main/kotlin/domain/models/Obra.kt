@@ -1,6 +1,7 @@
 package com.gomaruart.domain.models
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
 @Serializable
 data class Obra(
@@ -10,7 +11,11 @@ data class Obra(
     val precio: Double,
     val imagen_url: String,
     val tecnica_materiales: String? = null,
+
+    // 🔥 Mapeo para que entienda el JSON que viene de Android
+    @SerialName("categoryId")
     val id_categoria: Int,
+
     val id_admin: Int,
     val fecha_creacion: String = "",
     val activo: Boolean = true
@@ -23,7 +28,11 @@ data class ObraRequest(
     val precio: Double,
     val imagen_url: String,
     val tecnica_materiales: String? = null,
-    val id_categoria: Int
+
+    // 🔥 Mapeo también en el Request para los POST y PUT
+    @SerialName("categoryId")
+    val id_categoria: Int = 1
+
 )
 
 @Serializable

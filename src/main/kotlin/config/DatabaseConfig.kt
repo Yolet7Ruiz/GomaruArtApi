@@ -10,7 +10,7 @@ object DatabaseConfig {
     fun init() {
         if (dataSource == null) {
             val config = HikariConfig().apply {
-                jdbcUrl = "jdbc:postgresql://localhost:5432/gomaruart_db"
+                jdbcUrl = "jdbc:postgresql://44.219.179.103:5432/gomaruart_db"
                 username = "postgres"
                 password = "gomaru"
                 maximumPoolSize = 5

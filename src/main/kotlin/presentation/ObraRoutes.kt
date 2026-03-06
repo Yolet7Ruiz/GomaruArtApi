@@ -16,7 +16,7 @@ fun Route.obraRoutes() {
 
     route("/obras") {
 
-        // GET /obras - Listar todas
+        // 1. OBTENER TODAS
         get {
             try {
                 val obras = obraService.findAll()
@@ -26,68 +26,21 @@ fun Route.obraRoutes() {
             }
         }
 
-        // GET /obras/categoria/{id} - Filtrar por categoría
-        get("/categoria/{id}") {
-            try {
-                val idCategoria = call.parameters["id"]?.toIntOrNull()
-                if (idCategoria == null) {
-                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("INVALID_ID", "ID inválido"))
-                    return@get
-                }
-                val obras = obraService.findByCategoria(idCategoria)
-                call.respond(HttpStatusCode.OK, obras)
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("ERROR", e.message ?: "Error"))
-            }
-        }
-
-        // GET /obras/{id} - Obtener una obra
-        get("/{id}") {
-            try {
-                val id = call.parameters["id"]?.toIntOrNull()
-                if (id == null) {
-                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("INVALID_ID", "ID inválido"))
-                    return@get
-                }
-                val obra = obraService.findById(id)
-                if (obra != null) {
-                    call.respond(HttpStatusCode.OK, obra)
-                } else {
-                    call.respond(HttpStatusCode.NotFound, ErrorResponse("NOT_FOUND", "Obra no encontrada"))
-                }
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("ERROR", e.message ?: "Error"))
-            }
-        }
-
-        // POST /obras - Crear obra
+        // 2. CREAR (POST)
         post {
             try {
-                // Obtener el token del header Authorization
-                val authHeader = call.request.headers["Authorization"]
-                if (authHeader.isNullOrBlank()) {
-                    call.respond(HttpStatusCode.Unauthorized, ErrorResponse("UNAUTHORIZED", "Se requiere token de autenticación"))
-                    return@post
-                }
-
-                // Como solo hay un admin, usamos ID 1
-                // En un sistema real, aquí decodificarías el JWT
-                val idAdmin = 1
-
+                val idAdmin = 1 // Hardcoded para desarrollo
                 val request = call.receive<ObraRequest>()
                 val obra = obraService.create(request, idAdmin)
-
-                if (obra != null) {
-                    call.respond(HttpStatusCode.Created, obra)
-                } else {
-                    call.respond(HttpStatusCode.BadRequest, ErrorResponse("ERROR", "No se pudo crear"))
-                }
+                if (obra != null) call.respond(HttpStatusCode.Created, obra)
+                else call.respond(HttpStatusCode.BadRequest, ErrorResponse("ERROR", "No se pudo crear"))
             } catch (e: Exception) {
+                e.printStackTrace()
                 call.respond(HttpStatusCode.InternalServerError, ErrorResponse("ERROR", e.message ?: "Error"))
             }
         }
 
-        // PUT /obras/{id} - Actualizar
+        // 3. ACTUALIZAR (PUT)
         put("/{id}") {
             try {
                 val id = call.parameters["id"]?.toIntOrNull()
@@ -95,20 +48,17 @@ fun Route.obraRoutes() {
                     call.respond(HttpStatusCode.BadRequest, ErrorResponse("INVALID_ID", "ID inválido"))
                     return@put
                 }
-
                 val request = call.receive<ObraRequest>()
                 val obra = obraService.update(id, request)
-                if (obra != null) {
-                    call.respond(HttpStatusCode.OK, obra)
-                } else {
-                    call.respond(HttpStatusCode.NotFound, ErrorResponse("NOT_FOUND", "Obra no encontrada"))
-                }
+                if (obra != null) call.respond(HttpStatusCode.OK, obra)
+                else call.respond(HttpStatusCode.NotFound, ErrorResponse("NOT_FOUND", "No encontrada"))
             } catch (e: Exception) {
+                e.printStackTrace()
                 call.respond(HttpStatusCode.InternalServerError, ErrorResponse("ERROR", e.message ?: "Error"))
             }
         }
 
-        // DELETE /obras/{id} - Eliminar (soft delete)
+        // 4. ELIMINAR (DELETE)
         delete("/{id}") {
             try {
                 val id = call.parameters["id"]?.toIntOrNull()
@@ -116,14 +66,11 @@ fun Route.obraRoutes() {
                     call.respond(HttpStatusCode.BadRequest, ErrorResponse("INVALID_ID", "ID inválido"))
                     return@delete
                 }
-
                 val deleted = obraService.delete(id)
-                if (deleted) {
-                    call.respond(HttpStatusCode.OK, mapOf("message" to "Obra eliminada"))
-                } else {
-                    call.respond(HttpStatusCode.NotFound, ErrorResponse("NOT_FOUND", "Obra no encontrada"))
-                }
+                if (deleted) call.respond(HttpStatusCode.OK, mapOf("message" to "Obra eliminada"))
+                else call.respond(HttpStatusCode.NotFound, ErrorResponse("NOT_FOUND", "No encontrada"))
             } catch (e: Exception) {
+                e.printStackTrace()
                 call.respond(HttpStatusCode.InternalServerError, ErrorResponse("ERROR", e.message ?: "Error"))
             }
         }
